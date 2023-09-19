@@ -69,6 +69,7 @@ export const getMyProfile = async (req, res) => {
 export const logout = async (req, res) => {
   res.status(200).cookie("token","", { expires : new Date(Date.now())}).json({
     success: true,
+    message : "Logging out",
     user: req.user,
   });
 };
