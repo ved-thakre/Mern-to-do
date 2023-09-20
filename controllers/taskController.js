@@ -1,3 +1,4 @@
+import ErrorHandler from '../middlewares/errros.js';
 import { Task } from '../models/taskModel.js'
 
 export const newTask = async (req, res, next) => {
@@ -15,50 +16,53 @@ export const newTask = async (req, res, next) => {
     })
 }
 
-export const getMyTasks = async (req, res) => {
-    const userid = req.user._id;
+export const getMyTasks = async (req, res, next) => {
+    try {
+        const userid = req.user._id;
 
-    const tasks = await Task.find({user : userid});
+        const tasks = await Task.find({ user: userid });
 
-    res.status(200).json({
-        success: true,
-        tasks,
-    })
+        res.status(200).json({
+          success: true,
+          tasks,
+        });
+    } catch (error) {
+        next(error)
+    }
 };
 
 export const updateTask = async (req, res, next) => {
-  const task = await Task.findById(req.params.id);
+    try {
+        const task = await Task.findById(req.params.id);
 
-  next();
+        if (!task) return next(new ErrorHandler("Invalid ID", 404));
 
-  if (!task)
-    return exports.status(404).json({
-      success: false,
-      message: "Invalid ID",
-    });
+        task.isCompleted = !task.isCompleted;
 
-  task.isCompleted = !task.isCompleted;
+        await task.save();
 
-  await task.save();
-
-  res.status(200).json({
-    success: true,
-    message: "Task updated",
-  });
+        res.status(200).json({
+          success: true,
+          message: "Task updated",
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
 export const deleteTask = async (req, res, next) => {
-  const task = await Task.findById(req.params.id);
+    try {
+        const task = await Task.findById(req.params.id);
 
-  if(!task) return exports.status(404).json({
-    success: false,
-    message: "Invalid ID",
-  })
+        if (!task) return next(new ErrorHandler("Invalid ID", 404));
 
-  await task.deleteOne();
+        await task.deleteOne();
 
-  res.status(200).json({
-    success: true,
-    message: "Task deleted",
-  });
+        res.status(200).json({
+          success: true,
+          message: "Task deleted",
+        });
+    } catch (error) {
+        next(error);
+    }
 };
