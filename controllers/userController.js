@@ -54,7 +54,6 @@ export const getMyProfile = (req, res) => {
       user: req.user,
     })
 };
-
 export const logout = (req, res) => {
   res
     .status(200)
