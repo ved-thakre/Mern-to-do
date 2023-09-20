@@ -56,9 +56,16 @@ export const getMyProfile = (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.status(200).cookie("token","", { expires : new Date(Date.now())}).json({
-    success: true,
-    message : "Logging out",
-    user: req.user,
-  });
+  res
+    .status(200)
+    .cookie("token", "", {
+      expires: new Date(Date.now()),
+      sameSite: process.env.NODE_ENV === "Developement" ? "lax" : "none",
+      secure: process.env.NODE_ENV === "Developement" ? false : true,
+    })
+    .json({
+      success: true,
+      message: "Logging out",
+      user: req.user,
+    });
 };
